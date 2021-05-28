@@ -44,10 +44,20 @@ let persons =  [
       response.status(204).end()
     }) 
 
+    
+
   app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
   })
   
+  
+  app.get('/info', (request, response) => {
+    const personLength = persons.length
+    const time = new Date()
+    
+    response.send('<p>Phonebook has info for</p>'+personLength+'<p>people</p>'+new Date())
+  })
+
   app.get('/api/persons', (request, response) => {
     response.json(persons)
   })
@@ -64,18 +74,30 @@ let persons =  [
   
     if (!body.name) {
       return response.status(400).json({ 
-        error: 'content missing' 
+        error: 'name is missing' 
+      })
+    }else if (!body.number){
+      return response.status(400).json({
+        error: 'number is missing'
       })
     }
   
     const person = {
-      id: generateId(),
       name: body.name,
       number: body.number,
+      id: generateId(),
       date: new Date(),
       }
+
+      if (person.name === persons.name && person.number === persons.number){
+        return response.status(400).json({
+          error:'name and number must be unique'
+        })
+      }else{
+        persons = persons.concat(person)
+      }
   
-    persons = persons.concat(person)
+    
   
     response.json(person)
   })
